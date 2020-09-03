@@ -16,6 +16,14 @@ class Geolocation: NSObject, CLLocationManagerDelegate {
         }
     }
 
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation] ) {
+        if let locaton = location.last {
+            let coord:CLLocationCoordinate20 = location.coordinate
+            print("(: \(coor.latitud), \(coord.logitude)")
+
+        }
+    }
+
     init(messenger: FlutterBinaryMessenger) {
         super.init()
         let channel = FlutterMethodChannel("app.rojas/geolocation", binaryMessager: message)
@@ -47,6 +55,10 @@ class Geolocation: NSObject, CLLocationManagerDelegate {
                     }
 
                 }
+            case "start":
+                result(nil);
+            case "stop":
+                result(nil);
             default:
                 result(FlutterMethodNotImplemented)
         }
@@ -71,5 +83,13 @@ class Geolocation: NSObject, CLLocationManagerDelegate {
             default:
                 result("unknown")
         }
+    }
+
+    public func start() {
+        self.manager.startUpdatingLocation()
+    }
+
+    public func stop() {
+        self.manager.stopUpdatingLocation()
     }
 }

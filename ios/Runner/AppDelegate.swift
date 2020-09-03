@@ -3,6 +3,8 @@ import Flutter
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
+
+    var geolocation:Geolocation!
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -13,7 +15,7 @@ import Flutter
     let methodChannel = FlutterMethodChannel("app.rojas/geolocation", binaryMessenger: controller.binaryMessenger)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
 
-    Geolocation(messenger: controller.binaryMessenger);
+    self.geolocation = Geolocation(messenger: controller.binaryMessenger);
     
 
     methodChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
@@ -22,5 +24,9 @@ import Flutter
 
         }
     })
+  }
+
+  override func applicationWillTerminate(_ application: UIApplication) {
+      self.geolocation.stop()
   }
 }
