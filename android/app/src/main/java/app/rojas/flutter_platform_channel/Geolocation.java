@@ -17,21 +17,25 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.HashMap;
+
 import io.flutter.Log;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.plugins.shim.ShimPluginRegistry;
 import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
-public class Geolocation implements MethodChannel.MethodCallHandler{
+public class Geolocation implements MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
     private Activity activity;
     private MethodChannel.Result flutterResult;
     private int REQUEST_CODE = 1204;
 
     private FusedLocationProviderClient fusedLocationClient;
+    EventChannel.EventSink events;
 
     Geolocation(Activity activity, FlutterEngine flutterEngine) {
         this.activity = activity;
@@ -39,7 +43,10 @@ public class Geolocation implements MethodChannel.MethodCallHandler{
 
         BinaryMessenger messenger = flutterEngine.getDartExecutor().getBinaryMessenger();
         MethodChannel channel = new MethodChannel(messenger,"app.rojas/geolocation");
+        EventChannel eventChannel = new EventChannel(messenger,"app.rojas/geolocation-listener");
+
         channel.setMethodCallHandler(this);
+        eventChannel.setStreamHandler(this);
 
         ShimPluginRegistry registry = new ShimPluginRegistry(flutterEngine);
         PluginRegistry.Registrar registrar = registry.registrarFor("app.rojas/geolocation");
@@ -61,7 +68,13 @@ public class Geolocation implements MethodChannel.MethodCallHandler{
         public void onLocationResult(LocationResult locationResult) {
             if(locationResult != null) {
                 Location location = locationResult.getLastLocation();
-                Log.i("Hola mundo", location.getLatitude() + " " + location.getLongitude());
+                //Log.i("****** Hola mundo", location.getLatitude() + " " + location.getLongitude());
+                if(events != null) {
+                    HashMap<String, Double> data = new HashMap<>();
+                    data.put("lat", location.getLatitude());
+                    data.put("lng", location.getLongitude());
+                    events.success(data);
+                }
             }
         }
     };
@@ -92,8 +105,9 @@ public class Geolocation implements MethodChannel.MethodCallHandler{
         int status = ContextCompat.checkSelfPermission(this.activity, Manifest.permission.ACCESS_FINE_LOCATION);
         if( status == PackageManager.PERMISSION_GRANTED) {
             result.success("granted");
+        } else {
+            result.success("denied");
         }
-        result.success("denied");
     }
 
     private void request(MethodChannel.Result result) {
@@ -128,5 +142,15 @@ public class Geolocation implements MethodChannel.MethodCallHandler{
 
     public void stop() {
         fusedLocationClient.removeLocationUpdates(locationCallback);
+    }
+
+    @Override
+    public void onListen(Object arguments, EventChannel.EventSink events) {
+        this.events = events;
+    }
+
+    @Override
+    public void onCancel(Object arguments) {
+
     }
 }

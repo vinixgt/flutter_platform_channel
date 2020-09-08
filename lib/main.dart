@@ -21,8 +21,9 @@ class MyApp extends StatelessWidget {
       ),
       home: SplashPage(),
       onInit: () {
-        //Geolocation.instance.init();
+        Geolocation.instance.init();
       },
+      onDispose: Geolocation.instance.dispose(),
       routes: {
         'home': (_) => HomePage(),
         'request': (_) => RequestPage(),

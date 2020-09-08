@@ -17,19 +17,19 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
         BinaryMessenger messenger = flutterEngine.getDartExecutor().getBinaryMessenger();
-        MethodChannel methodChannel = new MethodChannel(messenger, "app.rojas/flutter_platform_channel");
+        //MethodChannel methodChannel = new MethodChannel(messenger, "app.rojas/flutter_platform_channel");
         this.geolocation = new Geolocation(this, flutterEngine);
-        methodChannel.setMethodCallHandler((MethodCall call, MethodChannel.Result result) -> {
-            if(call.method.equals("version")) {
-                String name = call.argument("name");
-                String lastName = call.argument("lastname");
-                int age = call.argument("age");
-                String version = getAndroidVersion();
-                result.success(version);
-            } else {
-                result.notImplemented();
-            }
-        });
+//        methodChannel.setMethodCallHandler((MethodCall call, MethodChannel.Result result) -> {
+//            if(call.method.equals("version")) {
+//                String name = call.argument("name");
+//                String lastName = call.argument("lastname");
+//                int age = call.argument("age");
+//                String version = getAndroidVersion();
+//                result.success(version);
+//            } else {
+//                result.notImplemented();
+//            }
+//        });
     }
 
     String getAndroidVersion() {

@@ -12,7 +12,8 @@ class RequestController extends GetxController {
     if(status == PermissionStatus.granted) {
       print('******** Permision granted');
       Get.offNamed('home');
+    } else {
+      print('******** Permission other permission');
     }
-    print('******** Permission other permission');
   }
 }

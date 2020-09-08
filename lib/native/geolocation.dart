@@ -1,5 +1,8 @@
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 enum PermissionStatus {
   unknown,
@@ -17,6 +20,23 @@ class Geolocation {
   
   
   final _channel = MethodChannel("app.rojas/geolocation");
+  final _event = EventChannel("app.rojas/geolocation-listener");
+  RxString _location = "".obs;
+  RxString get location => _location;
+
+
+  StreamSubscription _subscription;
+
+  void init() {
+    _subscription = _event.receiveBroadcastStream().listen((event) {
+      print('===== location: $_location');
+      _location.value = "${event['lat']}, ${event['lng']}";
+    });
+  }
+
+  dispose() {
+    _subscription?.cancel();
+  }
 
   Future<PermissionStatus> checkPermission() async {
     final String result = await this._channel.invokeMethod<String>("check");
